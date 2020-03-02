@@ -17,10 +17,9 @@ let clickableObjects = [];
 
 
 
-document.getElementsByClassName("canvas_wrapper")[0].addEventListener( 'click', onClick, false );
+
 window.addEventListener( 'load', renderAll, false );
-
-
+document.getElementsByClassName("canvas_wrapper")[0].addEventListener( 'click', onCanvasClick, false );
 document.getElementsByClassName("help")[0].addEventListener("click", () => {openAndClose("topic_help")}, false);
 
 
@@ -37,13 +36,13 @@ function openAndClose(windowId) {
   }
 }
 
-function onClick( event ) {
+function onCanvasClick( event ) {
 	mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
 	mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
   raycaster.setFromCamera( mouse, camera );
   let intersects = raycaster.intersectObjects( clickableObjects );
   let targetColor, targetVert, targetCube;
-	for ( let i = 0; i < intersects.length; i++ ) {
+	for (let i = 0; i < intersects.length; i++) {
     targetColor = intersects[i].object.material.color;
     targetVert = intersects[i].object.position;
 		targetCube = intersects[i].object.parent;
