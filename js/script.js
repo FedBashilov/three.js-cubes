@@ -1,3 +1,4 @@
+'use strict'
 let scene = new THREE.Scene();
 scene.background = new THREE.Color( 0xffffff );
 
@@ -16,7 +17,106 @@ let raycaster = new THREE.Raycaster();
 let clickableObjects = [];
 
 
+class Vertex {
+  constructor(x, y, z){
+    this.sphere = new THREE.Mesh(
+      new THREE.SphereGeometry( 0.08, 32, 32 ),
+      new THREE.MeshBasicMaterial( {
+        color: Math.random() * 0xffffff
+      })
+    );
+    [this.sphere.position.x, this.sphere.position.y, this.sphere.position.z] = [x, y, z];
+  }
 
+  addToCube(cube){
+    cube.add( this.sphere );
+  }
+
+  addToClickableObjects(clickableObjects){
+    clickableObjects.push( this.sphere );
+  }
+
+  get getVector3(){
+    return this.sphere.position;
+  }
+}
+
+class Edge {
+  constructor(vector1, vector2) {
+    let geometry = new THREE.Geometry();
+    geometry.vertices.push(vector1, vector2);
+    this.line = new THREE.Line(
+      geometry,
+      new THREE.LineBasicMaterial( {
+        color: 0x000
+      })
+    );
+  }
+  addToCube(cube){
+    cube.add( this.line );
+  }
+  get getVertices(){
+    return this.line.geometry.vertices;
+  }
+}
+
+class Cube {
+  constructor() {
+    this.group = new THREE.Group();
+    this._buildCube(this.group, getRandom(-2, 2), getRandom(-2, 2), getRandom(-2, 2));
+  }
+
+ _buildCube(cube, x, y, z) {
+    let vertices = [
+      new Vertex( 0+x, 0+y, 0+z ),
+      new Vertex( 1+x, 0+y, 0+z ),
+      new Vertex( 1+x, 0+y, 1+z ),
+      new Vertex( 0+x, 0+y, 1+z ),
+      new Vertex( 0+x, 1+y, 0+z ),
+      new Vertex( 1+x, 1+y, 0+z ),
+      new Vertex( 1+x, 1+y, 1+z ),
+      new Vertex( 0+x, 1+y, 1+z )
+    ];
+
+  //add vertices
+    vertices.forEach((vertex) => {
+      vertex.addToCube(cube);
+      vertex.addToClickableObjects(clickableObjects);
+    });
+
+  //draw lines
+    let edge;
+
+    //vertical lines
+    for (let i = 0; i < 4; i++) {
+      edge = new Edge(vertices[i].getVector3, vertices[i+4].getVector3);
+      edge.addToCube( cube );
+    }
+    //top and bottom face lines
+    for (let i = 0; i < 3; i++) {
+        //bottom
+        edge = new Edge(vertices[i].getVector3, vertices[i+1].getVector3);
+        edge.addToCube( cube );
+        //top
+        edge = new Edge(vertices[i+4].getVector3, vertices[i+5].getVector3);
+        edge.addToCube( cube );
+    }
+    //bottom
+    edge = new Edge(vertices[3].getVector3, vertices[0].getVector3);
+    edge.addToCube( cube );
+    //top
+    edge = new Edge(vertices[7].getVector3, vertices[4].getVector3);
+    edge.addToCube( cube );
+
+    cube.rotation.x = getRandom(0, 2*Math.PI);
+    cube.rotation.y = getRandom(0, 2*Math.PI);
+    cube.rotation.z = getRandom(0, 2*Math.PI);
+  }
+
+  addToScene(scene){
+    scene.add(this.group);
+  }
+}
 
 window.addEventListener( 'load', renderAll, false );
 document.getElementsByClassName("canvas_wrapper")[0].addEventListener( 'click', onCanvasClick, false );
@@ -62,14 +162,13 @@ function renderAll(){
   clearScene();
   let cubes = [];
   let cubesAmount = document.getElementsByClassName("amount_input")[0].value;
-  if(cubesAmount > 20){
-    document.getElementsByClassName("amount_input")[0].value = 20;
-    cubesAmount = 20;
+  if(cubesAmount < 0){
+    document.getElementsByClassName("amount_input")[0].value = 0;
+    cubesAmount = 0;
   }
   for (let i = 0; i < cubesAmount; i++){
-    cubes[i] = new THREE.Group();
-    drawCube(cubes[i], getRandom(-2, 2), getRandom(-2, 2), getRandom(-2, 2));
-    scene.add(cubes[i]);
+    cubes[i] = new Cube();
+    cubes[i].addToScene(scene);
   }
   renderer.render( scene, camera );
 }
@@ -81,77 +180,6 @@ function clearScene(){
   }
 }
 
-function drawCube(cube, x, y, z) {
-  let vertices = [
-    new THREE.Vector3( 0+x, 0+y, 0+z ),
-    new THREE.Vector3( 1+x, 0+y, 0+z ),
-    new THREE.Vector3( 1+x, 0+y, 1+z ),
-    new THREE.Vector3( 0+x, 0+y, 1+z ),
-    new THREE.Vector3( 0+x, 1+y, 0+z ),
-    new THREE.Vector3( 1+x, 1+y, 0+z ),
-    new THREE.Vector3( 1+x, 1+y, 1+z ),
-    new THREE.Vector3( 0+x, 1+y, 1+z )
-  ];
-
-//draw vertices
-  let sphere;
-  vertices.forEach((vertice) => {
-    sphere = new THREE.Mesh(
-      new THREE.SphereGeometry( 0.08, 32, 32 ),
-      new THREE.MeshBasicMaterial( {
-        color: Math.random() * 0xffffff
-      })
-    );
-    [sphere.position.x, sphere.position.y, sphere.position.z] = [vertice.x, vertice.y, vertice.z];
-    cube.add( sphere );
-    clickableObjects.push(sphere);
-  });
-
-//draw lines
-  let geometry, line;
-
-  //vertical lines
-  for (let i = 0; i < 4; i++) {
-    geometry = new THREE.Geometry();
-    geometry.vertices.push(vertices[i], vertices[i+4]);
-    line = new THREE.Line( geometry, getMaterialLine() );
-    cube.add( line );
-  }
-  //top and bottom face lines
-  for (let i = 0; i < 3; i++) {
-      //bottom
-      geometry = new THREE.Geometry();
-      geometry.vertices.push(vertices[i], vertices[i+1]);
-      line = new THREE.Line( geometry, getMaterialLine() );
-      cube.add( line );
-      //top
-      geometry = new THREE.Geometry();
-      geometry.vertices.push(vertices[i+4], vertices[i+5]);
-      line = new THREE.Line( geometry, getMaterialLine() );
-      cube.add( line );
-  }
-  //bottom
-  geometry = new THREE.Geometry();
-  geometry.vertices.push(vertices[3], vertices[0]);
-  line = new THREE.Line( geometry, getMaterialLine() );
-  cube.add( line );
-  //top
-  geometry = new THREE.Geometry();
-  geometry.vertices.push(vertices[7], vertices[4]);
-  line = new THREE.Line( geometry, getMaterialLine() );
-  cube.add( line );
-
-
-  cube.rotation.x = getRandom(0, 2*Math.PI);
-  cube.rotation.y = getRandom(0, 2*Math.PI);
-  cube.rotation.z = getRandom(0, 2*Math.PI);
-}
-
-function getMaterialLine() {
-  return new THREE.LineBasicMaterial( {
-    color: 0x000
-  } );
-}
 
 function objEqual (obj1, obj2){
    return JSON.stringify(obj1)===JSON.stringify(obj2);
