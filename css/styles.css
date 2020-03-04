@@ -9,16 +9,17 @@ canvas { display: block; }
   border: 1px solid blue;
   border-bottom-right-radius: 10px;
   background: white;
-  -webkit-box-shadow:0 0 4px 0 blue;
-  -moz-box-shadow:0 0 4px 0 blue;
-  box-shadow:0 0 4px 0 blue;
+  -webkit-box-shadow: 0 0 4px 0 blue;
+  -moz-box-shadow: 0 0 4px 0 blue;
+  box-shadow: 0 0 4px 0 blue;
 }
 
 .text3D{
   color: #fff;
   font-weight: bold;
   text-shadow: 0 1px 0 #ccc, 0 2px 0 #bbb, 0 3px 0 #aaa,
-   0 1px 3px rgba(0,0,0,.3), 0 3px 5px rgba(0,0,0,.2), 0 5px 10px rgba(0,0,0,.25), 0 10px 10px rgba(0,0,0,.2);
+   0 1px 3px rgba(0,0,0,.3), 0 3px 5px rgba(0,0,0,.2),
+   0 5px 10px rgba(0,0,0,.25), 0 10px 10px rgba(0,0,0,.2);
 }
 
 .help{
@@ -38,17 +39,17 @@ canvas { display: block; }
 }
 .help:active{
   background-color: #e05445;
-  -webkit-box-shadow:0 0 4px 0 blue;
-  -moz-box-shadow:0 0 4px 0 blue;
-  box-shadow:0 0 4px 0 blue;
+  -webkit-box-shadow: 0 0 4px 0 blue;
+  -moz-box-shadow: 0 0 4px 0 blue;
+  box-shadow: 0 0 4px 0 blue;
 }
 
 .topic_help{
   width: 245px;
   position: fixed;
   top: 35px;
-  right:-300px;
-  z-index:2;
+  right: -300px;
+  z-index: 2;
   color: black;
   text-align: left;
   padding: 10px;
@@ -57,13 +58,13 @@ canvas { display: block; }
   background-color: white;
 
   transition: right ease 0.6s;
-  -webkit-transition:right ease 0.6s;
-   -o-transition:right ease 0.6s;
-  -moz-transition:right ease 0.6s;
+  -webkit-transition: right ease 0.6s;
+   -o-transition: right ease 0.6s;
+  -moz-transition: right ease 0.6s;
 }
 .topic_help.open{
-  right:0px;
-  -webkit-box-shadow:0 0 4px 0 blue;
-  -moz-box-shadow:0 0 4px 0 blue;
-  box-shadow:0 0 4px 0 blue;
+  right: 0px;
+  -webkit-box-shadow: 0 0 4px 0 blue;
+  -moz-box-shadow: 0 0 4px 0 blue;
+  box-shadow: 0 0 4px 0 blue;
 }
