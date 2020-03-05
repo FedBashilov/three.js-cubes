@@ -17,7 +17,7 @@ let clickableObjects = [];
 class Vertex {
   constructor(x, y, z){
     this._sphere = new THREE.Mesh(
-      new THREE.SphereGeometry( 0.08, 32, 32 ),
+      new THREE.SphereGeometry( 0.07, 5, 5 ),
       new THREE.MeshBasicMaterial( {
         color: Math.random() * 0xffffff
       } )
@@ -42,11 +42,10 @@ class Edge {
   constructor(vector1, vector2) {
     let geometry = new THREE.Geometry();
     geometry.vertices.push(vector1, vector2);
-
     this._line = new THREE.Line(
       geometry,
       new THREE.LineBasicMaterial( {
-        color: 0x000
+        color: 0x000000
       } )
     );
   }
@@ -182,9 +181,18 @@ function renderAll(){
 
 function clearScene(){
   clickableObjects = [];
-  while(scene.children.length > 0){
-    scene.remove(scene.children[0]);
+
+  for (let i = scene.children.length - 1; i >= 0; i--) {
+    for (let j = scene.children[i].children.length - 1; j >= 0; j--) {
+      scene.children[i].children[j].geometry.dispose();
+      scene.children[i].children[j].material.dispose();
+      scene.children[i].remove(scene.children[i].children[j]);
+    }
+
+    scene.remove(scene.children[i]);
   }
+
+  scene.dispose();
 }
 
 function objEqual (obj1, obj2){
